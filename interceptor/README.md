@@ -36,3 +36,7 @@ Sure, here's what each of these variables represent:
 The `proxy_set_header` directive is used to re-define or append fields to the request header passed to the proxied server.
 
 The TCP_INFO socket option isn't widely supported in Nginx, so `$tcpinfo_rtt`, `$tcpinfo_rttvar`, `$tcpinfo_snd_cwnd`, and `$tcpinfo_rcv_space` may not work in all configurations. If you want to use these variables, you may need to compile Nginx with additional modules or patches. Please check the current documentation or consult with a network engineer or systems administrator for the most accurate information.
+
+## Reference Links
+Stackoverflow: [How to get headers in Nginx?](https://stackoverflow.com/a/69540402/13280339)
+NGINX Docs: [Variables in Nginx](http://nginx.org/en/docs/http/ngx_http_core_module.html#variables)
