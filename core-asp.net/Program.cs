@@ -1,5 +1,7 @@
 using System.Text.Json;
 using StackExchange.Redis;
+using SharpPcap;
+using PacketDotNet;
 
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
@@ -45,4 +47,53 @@ app.Use(async (context, next) =>
     await next.Invoke();
 });
 
+await Task.Run(() =>
+{
+    // Retrieve the device list
+    var devices = CaptureDeviceList.Instance;
+
+    // If no devices were found, print an error
+    if (devices.Count < 1)
+    {
+        Console.WriteLine("No devices were found on this machine");
+        return;
+    }
+    devices.ToList().ForEach(d => Console.WriteLine(d.Description));
+    // Take the first device from the list
+    var device = devices[6];
+
+    Console.WriteLine($"-- Using {device.Name} --");
+
+    // Open the device
+    device.Open();
+
+    // Register our handler function to the 'packet arrival' event
+    device.OnPacketArrival += new PacketArrivalEventHandler(device_OnPacketArrival);
+
+    // Start the capturing process
+    device.StartCapture();
+
+    // Wait for one second
+    System.Threading.Thread.Sleep(1000);
+
+    // Stop the capturing process
+    //device.StopCapture();
+
+    // Close the pcap device
+    //device.Close();
+});
+
 app.Run();
+
+// Callback function invoked by SharpPcap for every incoming packet
+// Callback function invoked by SharpPcap for every incoming packet
+static void device_OnPacketArrival(object sender, PacketCapture e)
+{
+    var packet = PacketDotNet.Packet.ParsePacket(e.GetPacket().LinkLayerType, e.GetPacket().Data);
+
+    //Console.WriteLine(packet.ToString());
+
+    //print the strucutre of the packet
+    Console.WriteLine(packet.ToString(StringOutputType.VerboseColored));
+
+}
